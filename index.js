@@ -1,64 +1,43 @@
 const galleryContainer = document.querySelector('.gallery-container');
-const galleryControlsContainer = document.querySelector('.gallery-controls');
-const galleryControls = ['previous', 'next'];
 const galleryItems = document.querySelectorAll('.gallery-item');
+const galleryControlsContainer = document.querySelector('.gallery-controls');
 
 class Carousel {
   constructor(container, items, controls) {
     this.carouselContainer = container;
     this.carouselControls = controls;
     this.carouselArray = [...items];
+
+    this.addEventListeners();
   }
 
   updateGallery() {
-    this.carouselArray.forEach((el) => {
-      el.classList.remove('gallery-item-1');
-      el.classList.remove('gallery-item-2');
-      el.classList.remove('gallery-item-3');
-      el.classList.remove('gallery-item-4');
-      el.classList.remove('gallery-item-5');
-    });
-
-    this.carouselArray.slice(0, 5).forEach((el, i) => {
+    this.carouselArray.forEach((el, i) => {
+      el.classList.remove(...el.classList);
+      el.classList.add('gallery-item');
       el.classList.add(`gallery-item-${i + 1}`);
     });
   }
 
-  setCurrentState(direction) {
-    if (direction.className === 'gallery-controls-previous') {
+  addEventListeners() {
+    const [prev, next] = galleryControlsContainer.children;
+
+    prev.addEventListener('click', (e) => {
+      e.preventDefault();
       this.carouselArray.unshift(this.carouselArray.pop());
-    } else {
-      this.carouselArray.push(this.carouselArray.shift());
-    }
-    this.updateGallery();
-  }
-
-  setControls() {
-    this.carouselControls.forEach((control) => {
-      galleryControlsContainer.appendChild(
-        document.createElement('button')
-      ).className = `gallery-controls-${control}`;
-      document.querySelector(`.gallery-controls-${control}`).innerText =
-        control;
+      this.updateGallery();
     });
-  }
 
-  useControls() {
-    const triggers = [...galleryControlsContainer.children];
-    triggers.forEach((control) => {
-      control.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.setCurrentState(control);
-      });
+    next.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.carouselArray.push(this.carouselArray.shift());
+      this.updateGallery();
     });
   }
 }
 
-const exampleCarousel = new Carousel(
+new Carousel(
   galleryContainer,
   galleryItems,
-  galleryControls
+  galleryControlsContainer
 );
-
-exampleCarousel.setControls();
-exampleCarousel.useControls();
